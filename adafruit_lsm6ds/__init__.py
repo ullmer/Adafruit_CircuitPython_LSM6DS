@@ -138,7 +138,8 @@ AccelHPF.add_values(
 
 LSM6DS_DEFAULT_ADDRESS = const(0x6A)
 
-LSM6DS_CHIP_ID = const(0x6C)
+LSM6DS_CHIP_ID  = const(0x6C)
+LSM6DS_CHIP_ID2 = const(0x69) #Observing this on some chips; haven't validated in datasheet. BAU
 
 _LSM6DS_MLC_INT1 = const(0x0D)
 _LSM6DS_WHOAMI = const(0xF)
@@ -225,9 +226,10 @@ class LSM6DS:  # pylint: disable=too-many-instance-attributes
         self.i2c_device = i2c_device.I2CDevice(i2c_bus, address)
         if self.CHIP_ID is None:
             raise AttributeError("LSM6DS Parent Class cannot be directly instantiated")
-        if self._chip_id != self.CHIP_ID:
+        if self._chip_id != self.CHIP_ID and self._chip_id != LSM6DS_CHIP_ID2:
             raise RuntimeError(
-                "Failed to find %s - check your wiring!" % self.__class__.__name__
+                "Failed to find %s - check your wiring! (%s, %s, %s)" % 
+                (self.__class__.__name__, str(self._chip_id), str(self.CHIP_ID), str(address))
             )
         self.reset()
         if not hasattr(GyroRange, "string"):
